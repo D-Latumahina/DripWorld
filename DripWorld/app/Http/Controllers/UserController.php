@@ -3,12 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Events\OurExampleEvent;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function showProfilePage() {
+        return view('/profile');
+    }
+
+    public function showEditProfileForm(User $user) {
+            return view('edit-profile', ['user' => $user]);
+
+            $incomingFields = $request->validate([
+                'id',
+                'name' => 'required', 
+                'avatar', 
+                'email' => 'required',
+                'street',
+                'houseNumber',
+                'zipcode',
+                'country',
+                'phone'
+            ]);
+    
+            $incomingFields['name'] = strip_tags($incomingFields['name']);
+            $incomingFields['avatar'] = strip_tags($incomingFields['avatar']);
+            $incomingFields['email'] = strip_tags($incomingFields['email']);
+            $incomingFields['street'] = strip_tags($incomingFields['street']);
+            $incomingFields['houseNumber'] = strip_tags($incomingFields['houseNumber']);
+            $incomingFields['zipcode'] = strip_tags($incomingFields['zipcode']);
+            $incomingFields['country'] = strip_tags($incomingFields['country']);
+            $incomingFields['phone'] = strip_tags($incomingFields['phone']);
+    }
+
+    public function actuallyUpdateProfile(User $user, Request $request) {
+            $incomingFields = $request->validate([
+                'name' => 'required', 
+                'avatar', 
+                'email' => 'required',
+                'street',
+                'houseNumber',
+                'zipcode',
+                'country',
+                'phone'
+            ]);
+    
+            $user->update($incomingFields);
+            return redirect('/profile/' . auth()->user()->id)->with('success', 'Profile successfully updated.');
+    }
+
     public function showLoginPage (Request $request){
         return view('/login');
     }
