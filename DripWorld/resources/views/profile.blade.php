@@ -10,6 +10,9 @@
     <h1>profile page</h1>
     <hr>
     <div>
+        <a href="/profile/{{auth()->user()->username}}" class="mr-2"><img title="My Profile" data-toggle="tooltip" data-placement="bottom" style="width: 32px; height: 32px; border-radius: 16px" src="{{auth()->user()->avatar}}" /></a>
+    </div>
+    <div>
     <label for="profile-name" class="text-muted mb-1"><small>Name</small><h5>{{auth()->user()->name}}</h5></label>
     </div>
     <div>

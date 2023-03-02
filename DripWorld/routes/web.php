@@ -31,3 +31,5 @@ Route::post('/logout', [UserController::class, "logout"]);
 Route::get('/profile/{id}', [UserController::class, "showProfilePage"]);
 Route::get('/profile/{user_id}/edit', [UserController::class, "showEditProfileForm"]);
 Route::put('/profile/{user_id}', [UserController::class, "actuallyUpdateProfile"]);
+Route::get('/manage-avatar', [UserController::class, 'showAvatarForm']);
+Route::post('/manage-avatar', [UserController::class, 'storeAvatar']);

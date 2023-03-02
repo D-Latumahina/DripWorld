@@ -7,6 +7,9 @@ use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Events\OurExampleEvent;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -16,27 +19,6 @@ class UserController extends Controller
 
     public function showEditProfileForm(User $user) {
             return view('edit-profile', ['user' => $user]);
-
-            $incomingFields = $request->validate([
-                'id',
-                'name' => 'required', 
-                'avatar', 
-                'email' => 'required',
-                'street',
-                'houseNumber',
-                'zipcode',
-                'country',
-                'phone'
-            ]);
-    
-            $incomingFields['name'] = strip_tags($incomingFields['name']);
-            $incomingFields['avatar'] = strip_tags($incomingFields['avatar']);
-            $incomingFields['email'] = strip_tags($incomingFields['email']);
-            $incomingFields['street'] = strip_tags($incomingFields['street']);
-            $incomingFields['houseNumber'] = strip_tags($incomingFields['houseNumber']);
-            $incomingFields['zipcode'] = strip_tags($incomingFields['zipcode']);
-            $incomingFields['country'] = strip_tags($incomingFields['country']);
-            $incomingFields['phone'] = strip_tags($incomingFields['phone']);
     }
 
     public function actuallyUpdateProfile(User $user, Request $request) {
@@ -50,8 +32,18 @@ class UserController extends Controller
                 'country',
                 'phone'
             ]);
-    
-            $user->update($incomingFields);
+            
+            $user =Auth::user();
+            $user->avatar = $request['avatar'];
+            $user->name = $request['name'];
+            $user->email = $request['email'];
+            $user->street = $request['street'];
+            $user->houseNumber = $request['houseNumber'];
+            $user->zipcode = $request['zipcode'];
+            $user->country = $request['country'];
+            $user->phone = $request['phone'];
+            $user->save();
+            // $user->update($incomingFields);
             return redirect('/profile/' . auth()->user()->id)->with('success', 'Profile successfully updated.');
     }
 
@@ -87,7 +79,7 @@ class UserController extends Controller
 
     public function register(Request $request) {
     $incomingFields = $request->validate([
-        'name' => ['required', 'min:3', 'max:20', Rule::unique('users', 'name')],
+        'name' => ['required', 'min:3', 'max:20'],
         'email' => ['required', 'email', Rule::unique('users', 'email')],
         'password' => ['required', 'min:8', 'confirmed']
     ]);
@@ -97,5 +89,33 @@ class UserController extends Controller
     $user = User::create($incomingFields);
     auth()->login($user);
     return redirect('/')->with('success', 'Thank you for creating an account.');
+}
+
+public function storeAvatar(Request $request) {
+    $request->validate([
+        'avatar' => 'required|image|max:3000'
+    ]);
+
+    $user = auth()->user();
+
+    $filename = $user->id . '-' . uniqid() . '.jpg';
+
+    $imgData = Image::make($request->file('avatar'))->fit(120)->encode('jpg');
+    Storage::put('public/avatars/' . $filename, $imgData);
+
+    $oldAvatar = $user->avatar;
+
+    $user->avatar = $filename;
+    $user->save();
+
+    if ($oldAvatar != "/fallback-avatar.jpg") {
+        Storage::delete(str_replace("/storage/", "public/", $oldAvatar));
+    }
+
+    return back()->with('success', 'Congrats on the new avatar.');
+}
+
+public function showAvatarForm() {
+    return view('avatar-form');
 }
 }
