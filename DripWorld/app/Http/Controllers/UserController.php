@@ -43,7 +43,6 @@ class UserController extends Controller
             $user->country = $request['country'];
             $user->phone = $request['phone'];
             $user->save();
-            // $user->update($incomingFields);
             return redirect('/profile/' . auth()->user()->id)->with('success', 'Profile successfully updated.');
     }
 

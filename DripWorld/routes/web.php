@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\Profile;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SellController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Profile;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,3 +34,7 @@ Route::get('/profile/{user_id}/edit', [UserController::class, "showEditProfileFo
 Route::put('/profile/{user_id}', [UserController::class, "actuallyUpdateProfile"]);
 Route::get('/manage-avatar', [UserController::class, 'showAvatarForm']);
 Route::post('/manage-avatar', [UserController::class, 'storeAvatar']);
+
+Route::get('/sell', [SellController::class, 'showSellForm']);
+Route::post('/sell', [SellController::class, 'actuallySell']);
+Route::get('/sell/for-sale', [SellController::class, 'showForSellPage']);
